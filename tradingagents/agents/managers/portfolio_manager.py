@@ -1,4 +1,10 @@
-"""Portfolio Manager: synthesises the risk-analyst debate into the final decision.
+"""Editor: synthesises the risk-analyst debate into the closing view.
+
+Class symbol names (``PortfolioDecision``, the file path
+``managers/portfolio_manager.py``, and the LangGraph node label
+``Portfolio Manager``) are kept stable in this fork to keep upstream
+rebases clean.  The user-facing role is the Editor in prompts and
+rendered output.
 
 Uses LangChain's ``with_structured_output`` so the LLM produces a typed
 ``PortfolioDecision`` directly, in a single call.  The result is rendered
@@ -39,29 +45,29 @@ def create_portfolio_manager(llm):
             else ""
         )
 
-        prompt = f"""As the Portfolio Manager, synthesize the risk analysts' debate and deliver the final trading decision.
+        prompt = f"""As the Editor, synthesize the risk analysts' debate and deliver the closing view.
 
 {instrument_context}
 
 ---
 
-**Rating Scale** (use exactly one):
-- **Buy**: Strong conviction to enter or add to position
-- **Overweight**: Favorable outlook, gradually increase exposure
-- **Hold**: Maintain current position, no action needed
-- **Underweight**: Reduce exposure, take partial profits
-- **Sell**: Exit position or avoid entry
+**Lean Scale** (use exactly one):
+- **Strong Bullish**: High confidence the bull case is right
+- **Bullish Lean**: The bull case is well-supported and outweighs the bear case
+- **Neutral**: The evidence on both sides is genuinely balanced — reserve for true uncertainty, not a default
+- **Bearish Lean**: The bear case is well-supported and the long thesis has meaningful downside risk
+- **Strong Bearish**: High confidence the bear case is right
 
 **Context:**
-- Research Manager's investment plan: **{research_plan}**
-- Trader's transaction proposal: **{trader_plan}**
+- Research Manager's interim view: **{research_plan}**
+- Trader's directional sub-lean: **{trader_plan}**
 {lessons_line}
 **Risk Analysts Debate History:**
 {history}
 
 ---
 
-Be decisive and ground every conclusion in specific evidence from the analysts.{get_language_instruction()}"""
+Be decisive and ground every conclusion in specific evidence from the analysts. Frame everything as analytical observation — describe what the case implies for the long thesis, not what a reader should do.{get_language_instruction()}"""
 
         final_trade_decision = invoke_structured_or_freetext(
             structured_llm,
