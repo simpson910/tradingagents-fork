@@ -19,20 +19,20 @@ def create_research_manager(llm):
 
         investment_debate_state = state["investment_debate_state"]
 
-        prompt = f"""As the Research Manager and debate facilitator, your role is to critically evaluate this round of debate and deliver a clear, actionable investment plan for the trader.
+        prompt = f"""As the Research Manager and debate facilitator, your role is to critically evaluate this round of debate and deliver a clear interim view that the trader can build a sub-lean proposal around.
 
 {instrument_context}
 
 ---
 
-**Rating Scale** (use exactly one):
-- **Buy**: Strong conviction in the bull thesis; recommend taking or growing the position
-- **Overweight**: Constructive view; recommend gradually increasing exposure
-- **Hold**: Balanced view; recommend maintaining the current position
-- **Underweight**: Cautious view; recommend trimming exposure
-- **Sell**: Strong conviction in the bear thesis; recommend exiting or avoiding the position
+**Lean Scale** (use exactly one):
+- **Strong Bullish**: High confidence the bull case is right; the analytical case for the long thesis is unusually strong
+- **Bullish Lean**: The bull case is well-supported and outweighs the bear case
+- **Neutral**: Reserve for situations where the evidence on both sides is genuinely balanced — not a default
+- **Bearish Lean**: The bear case is well-supported and the long thesis has meaningful downside risk
+- **Strong Bearish**: High confidence the bear case is right; the analytical case against the long thesis is unusually strong
 
-Commit to a clear stance whenever the debate's strongest arguments warrant one; reserve Hold for situations where the evidence on both sides is genuinely balanced.
+Commit to a clear lean whenever the debate's strongest arguments warrant one; reserve Neutral for situations where the evidence on both sides is genuinely balanced. Frame your synthesis as analytical observation — describe what the case implies for the long thesis, not what a reader should do.
 
 ---
 
