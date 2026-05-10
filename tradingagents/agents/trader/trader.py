@@ -26,20 +26,23 @@ def create_trader(llm):
             {
                 "role": "system",
                 "content": (
-                    "You are a trading agent analyzing market data to make investment decisions. "
-                    "Based on your analysis, provide a specific recommendation to buy, sell, or hold. "
-                    "Anchor your reasoning in the analysts' reports and the research plan."
+                    "You are a research-team trader analyzing market data to assess "
+                    "the directional sub-lean for the long thesis. Based on your "
+                    "analysis, provide a specific Bullish, Neutral, or Bearish "
+                    "sub-lean. Anchor your reasoning in the analysts' reports and "
+                    "the research plan. Frame everything as analytical observation "
+                    "— describe what the case implies, never what a reader should do."
                 ),
             },
             {
                 "role": "user",
                 "content": (
-                    f"Based on a comprehensive analysis by a team of analysts, here is an investment "
-                    f"plan tailored for {company_name}. {instrument_context} This plan incorporates "
+                    f"Based on a comprehensive analysis by a team of analysts, here is an interim "
+                    f"view tailored for {company_name}. {instrument_context} This view incorporates "
                     f"insights from current technical market trends, macroeconomic indicators, and "
-                    f"social media sentiment. Use this plan as a foundation for evaluating your next "
-                    f"trading decision.\n\nProposed Investment Plan: {investment_plan}\n\n"
-                    f"Leverage these insights to make an informed and strategic decision."
+                    f"social media sentiment. Use this as a foundation for evaluating the "
+                    f"directional sub-lean.\n\nResearch Manager's interim view: {investment_plan}\n\n"
+                    f"Leverage these insights to make an informed analytical assessment."
                 ),
             },
         ]
