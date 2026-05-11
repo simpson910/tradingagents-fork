@@ -52,15 +52,25 @@ def _input_to_messages(input_: Any) -> list:
 class DeepSeekChatOpenAI(NormalizedChatOpenAI):
     """DeepSeek-specific overrides on top of the OpenAI-compatible client.
 
-    Two quirks that don't apply to other OpenAI-compatible providers:
+    Three quirks that don't apply to other OpenAI-compatible providers:
 
-    1. **Thinking-mode round-trip.** When DeepSeek's thinking models return
-       a response with ``reasoning_content``, that field must be echoed
-       back as part of the assistant message on the next turn or the API
-       fails with HTTP 400. ``_create_chat_result`` captures the field on
-       receive and ``_get_request_payload`` re-attaches it on send.
+    1. **Thinking-mode round-trip — non-streaming path.** When DeepSeek's
+       thinking models return a response with ``reasoning_content``,
+       that field must be echoed back as part of the assistant message
+       on the next turn or the API fails with HTTP 400.
+       ``_create_chat_result`` captures it on receive and
+       ``_get_request_payload`` re-attaches it on send.
 
-    2. **DeepSeek v4 + reasoner reject tool_choice.** Structured output
+    2. **Thinking-mode round-trip — streaming path.** Upstream
+       langchain-openai drops ``delta.reasoning_content`` chunks
+       silently, so the accumulated AIMessage from a streamed call
+       lacks the field DeepSeek requires on the next turn.
+       ``_convert_chunk_to_generation_chunk`` stashes each delta on the
+       chunk's additional_kwargs; langchain's chunk merge then
+       reassembles it on the final AIMessage and quirk 1's send-side
+       override re-attaches it.
+
+    3. **DeepSeek v4 + reasoner reject tool_choice.** Structured output
        via function-calling triggers HTTP 400 ("deepseek-reasoner does
        not support this tool_choice"). The API surfaces the same error
        for every v4 model and the ``deepseek-chat`` alias as of
@@ -109,6 +119,37 @@ class DeepSeekChatOpenAI(NormalizedChatOpenAI):
             if reasoning is not None:
                 generation.message.additional_kwargs["reasoning_content"] = reasoning
         return chat_result
+
+    def _convert_chunk_to_generation_chunk(
+        self, chunk, default_chunk_class, base_generation_info
+    ):
+        """Capture per-chunk reasoning_content during streaming.
+
+        Upstream langchain-openai's _convert_delta_to_message_chunk
+        consumes only ``content``/``tool_calls``/``function_call`` from
+        the delta and drops ``reasoning_content``. DeepSeek thinking
+        models stream reasoning_content as a separate field; the
+        accumulated text must be echoed back on subsequent turns or the
+        next call 400s with "The reasoning_content in the thinking mode
+        must be passed back to the API."
+
+        Stash each delta on the chunk's ``additional_kwargs`` so
+        langchain's chunk merge (string-concat via ``merge_dicts``)
+        rebuilds the full reasoning_content on the final AIMessage; the
+        existing ``_get_request_payload`` override then re-attaches it.
+        """
+        generation_chunk = super()._convert_chunk_to_generation_chunk(
+            chunk, default_chunk_class, base_generation_info
+        )
+        if generation_chunk is None:
+            return None
+        choices = chunk.get("choices") or chunk.get("chunk", {}).get("choices") or []
+        if choices:
+            delta = choices[0].get("delta") or {}
+            reasoning = delta.get("reasoning_content")
+            if reasoning:
+                generation_chunk.message.additional_kwargs["reasoning_content"] = reasoning
+        return generation_chunk
 
     def with_structured_output(self, schema, *, method=None, **kwargs):
         if self.model_name in self._NO_TOOL_CHOICE_MODELS:
