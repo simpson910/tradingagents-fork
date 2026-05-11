@@ -60,11 +60,27 @@ class DeepSeekChatOpenAI(NormalizedChatOpenAI):
        fails with HTTP 400. ``_create_chat_result`` captures the field on
        receive and ``_get_request_payload`` re-attaches it on send.
 
-    2. **deepseek-reasoner has no tool_choice.** Structured output via
-       function-calling is unavailable, so we raise NotImplementedError
-       and let the agent factories fall back to free-text generation
-       (see ``tradingagents/agents/utils/structured.py``).
+    2. **DeepSeek v4 + reasoner reject tool_choice.** Structured output
+       via function-calling triggers HTTP 400 ("deepseek-reasoner does
+       not support this tool_choice"). The API surfaces the same error
+       for every v4 model and the ``deepseek-chat`` alias as of
+       2026-05-11, so we pre-empt the round-trip by raising
+       NotImplementedError for the whole known-reject set and let the
+       agent factories fall back to free-text generation (see
+       ``tradingagents/agents/utils/structured.py``).
     """
+
+    # Empirically known to reject tool_choice=required as of 2026-05-11.
+    # Add new entries here if a future model exhibits the same 400 instead
+    # of letting every call eat one wasted API round trip before fallback.
+    _NO_TOOL_CHOICE_MODELS = frozenset(
+        {
+            "deepseek-reasoner",
+            "deepseek-v4-flash",
+            "deepseek-v4-pro",
+            "deepseek-chat",
+        }
+    )
 
     def _get_request_payload(self, input_, *, stop=None, **kwargs):
         payload = super()._get_request_payload(input_, stop=stop, **kwargs)
@@ -95,9 +111,9 @@ class DeepSeekChatOpenAI(NormalizedChatOpenAI):
         return chat_result
 
     def with_structured_output(self, schema, *, method=None, **kwargs):
-        if self.model_name == "deepseek-reasoner":
+        if self.model_name in self._NO_TOOL_CHOICE_MODELS:
             raise NotImplementedError(
-                "deepseek-reasoner does not support tool_choice; structured "
+                f"{self.model_name} does not support tool_choice; structured "
                 "output is unavailable. Agent factories fall back to "
                 "free-text generation automatically."
             )
