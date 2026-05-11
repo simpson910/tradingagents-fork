@@ -39,14 +39,25 @@ _RATING_LOWER = tuple(r.lower() for r in RATINGS_5_TIER)
 # values like "Strong Bullish" survive.
 _LEAN_LABEL_RE = re.compile(r"\blean\b.*?[:\-]\s*([^\n]+)", re.IGNORECASE)
 
+# Matches a markdown-bold phrase: **anything**. Used to count the tiers
+# the editor explicitly emphasised vs. passing prose references.
+_BOLD_PHRASE_RE = re.compile(r"\*\*\s*([^*]+?)\s*\*\*")
+
 
 def parse_rating(text: str, default: str = "Neutral") -> str:
     """Heuristically extract a 5-tier closing lean from prose text.
 
-    Two-pass strategy:
-    1. Look for an explicit "Lean: X" label (tolerant of markdown bold and
-       hyphen vs colon separator).  Returns the canonical capitalisation.
-    2. Fall back to scanning for any 5-tier lean phrase anywhere in the text.
+    Three-pass strategy:
+    1. Look for an explicit "Lean: X" label line (tolerant of markdown
+       bold and hyphen vs colon separator).
+    2. Count tiers inside markdown bold (``**X**``).  The editor emphasises
+       the actual stance; passing references to adjacent tiers ("supports
+       a **Bearish Lean** over a Strong Bearish stance") stay plain. Most
+       frequent bold tier wins; ties resolve toward Neutral (more
+       conservative).  This prevents a single unbolded mention of an
+       adjacent tier from hijacking the parser.
+    3. Fall back to scanning for any 5-tier phrase anywhere in the text
+       (legacy behaviour for un-formatted output).
 
     Returns one of the canonical strings in :data:`RATINGS_5_TIER`, or
     ``default`` if no lean phrase is found.
@@ -58,6 +69,18 @@ def parse_rating(text: str, default: str = "Neutral") -> str:
             for canonical, lower in zip(RATINGS_5_TIER, _RATING_LOWER):
                 if captured.startswith(lower):
                     return canonical
+
+    bold_counts = {c: 0 for c in RATINGS_5_TIER}
+    for m in _BOLD_PHRASE_RE.finditer(text):
+        captured = m.group(1).strip().lower()
+        for canonical, lower in zip(RATINGS_5_TIER, _RATING_LOWER):
+            if captured == lower:
+                bold_counts[canonical] += 1
+                break
+    nonzero = [(c, n) for c, n in bold_counts.items() if n > 0]
+    if nonzero:
+        nonzero.sort(key=lambda x: (-x[1], abs(RATINGS_5_TIER.index(x[0]) - 2)))
+        return nonzero[0][0]
 
     text_lower = text.lower()
     for canonical, lower in zip(RATINGS_5_TIER, _RATING_LOWER):
