@@ -20,18 +20,28 @@ from tradingagents.agents.utils.news_data_tools import (
 )
 
 
-def get_language_instruction() -> str:
-    """Return a prompt instruction for the configured output language.
+def get_style_instruction() -> str:
+    """Return prompt instructions for user-facing output style.
 
-    Returns empty string when English (default), so no extra tokens are used.
-    Only applied to user-facing agents (analysts, portfolio manager).
-    Internal debate agents stay in English for reasoning quality.
+    Two rules concatenated:
+    1. Editorial style — no emojis or decorative symbols. DeepSeek (and
+       most modern LLMs) decorate Markdown with 📊 🟢 🔴 etc. by default,
+       which breaks Steelman's editorial tone (Stratechery / Seeking
+       Alpha / FinChat don't use emojis in research notes). We tell the
+       model not to.
+    2. Output language — only appended if a non-English language is
+       configured. Internal debate agents stay in English for reasoning
+       quality regardless.
+
+    Applied to user-facing agents only (analysts, portfolio manager).
     """
+    style = " Use plain prose and Markdown tables only. Do not use emojis, decorative icons, or symbol bullets."
+
     from tradingagents.dataflows.config import get_config
     lang = get_config().get("output_language", "English")
     if lang.strip().lower() == "english":
-        return ""
-    return f" Write your entire response in {lang}."
+        return style
+    return style + f" Write your entire response in {lang}."
 
 
 def build_instrument_context(ticker: str) -> str:
