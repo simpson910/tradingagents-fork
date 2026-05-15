@@ -28,7 +28,9 @@ Latest World Affairs Report: {news_report}
 Company Fundamentals Report: {fundamentals_report}
 Here is the current conversation history: {history} Here is the last response from the aggressive analyst: {current_aggressive_response} Here is the last response from the neutral analyst: {current_neutral_response}. If there are no responses from the other viewpoints yet, present your own argument based on the available data.
 
-Engage by questioning their optimism and emphasizing the potential downsides they may have overlooked. Address each of their counterpoints to showcase why a conservative stance is ultimately the safest path for the firm's assets. Focus on debating and critiquing their arguments to demonstrate the strength of a low-risk strategy over their approaches. Output conversationally as if you are speaking without any special formatting."""
+Engage by questioning their optimism and emphasizing the potential downsides they may have overlooked. Address each of their counterpoints to articulate where a conservative framing better reflects downside exposure. Focus on debating and critiquing their arguments to demonstrate where the low-risk framing has stronger evidentiary support.
+
+Frame your case as analytical observation — describe what the capital-preservation framing implies for the long thesis and which evidence supports it. Avoid imperative or directive language ("you should", "the right move is", "the only play") and do not address the reader directly. Output conversationally as if you are speaking without any special formatting."""
 
         response = llm.invoke(prompt)
 

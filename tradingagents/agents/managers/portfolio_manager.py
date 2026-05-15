@@ -1,10 +1,11 @@
 """Editor: synthesises the risk-analyst debate into the closing view.
 
-Class symbol names (``PortfolioDecision``, the file path
-``managers/portfolio_manager.py``, and the LangGraph node label
-``Portfolio Manager``) are kept stable in this fork to keep upstream
-rebases clean.  The user-facing role is the Editor in prompts and
-rendered output.
+The class symbol name ``PortfolioDecision`` and the file path
+``managers/portfolio_manager.py`` are kept stable in this fork to keep
+upstream rebases clean. The LangGraph node label, the structured-output
+label, and the prompt body all say "Editor" — the SaaS frontend streams
+the node label to users, so any "Portfolio Manager" leak would hit
+Steelman's fiduciary-vocab ban.
 
 Uses LangChain's ``with_structured_output`` so the LLM produces a typed
 ``PortfolioDecision`` directly, in a single call.  The result is rendered
@@ -28,7 +29,7 @@ from tradingagents.agents.utils.structured import (
 
 
 def create_portfolio_manager(llm):
-    structured_llm = bind_structured(llm, PortfolioDecision, "Portfolio Manager")
+    structured_llm = bind_structured(llm, PortfolioDecision, "Editor")
 
     def portfolio_manager_node(state) -> dict:
         instrument_context = build_instrument_context(state["company_of_interest"])
@@ -74,7 +75,7 @@ Be decisive and ground every conclusion in specific evidence from the analysts. 
             llm,
             prompt,
             render_pm_decision,
-            "Portfolio Manager",
+            "Editor",
         )
 
         new_risk_debate_state = {

@@ -30,7 +30,9 @@ Latest world affairs news: {news_report}
 Company fundamentals report: {fundamentals_report}
 Conversation history of the debate: {history}
 Last bull argument: {current_response}
-Use this information to deliver a compelling bear argument, refute the bull's claims, and engage in a dynamic debate that demonstrates the risks and weaknesses of investing in the stock.
+Use this information to deliver a compelling bear argument, refute the bull's claims, and engage in a dynamic debate that demonstrates the risks and weaknesses of the long thesis.
+
+Frame your case as analytical observation — describe what the bear thesis implies and which evidence supports it. Avoid imperative or directive language ("you should", "the right move is", "the only play") and do not address the reader directly.
 """
 
         response = llm.invoke(prompt)

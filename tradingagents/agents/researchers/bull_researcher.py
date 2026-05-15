@@ -29,6 +29,8 @@ Company fundamentals report: {fundamentals_report}
 Conversation history of the debate: {history}
 Last bear argument: {current_response}
 Use this information to deliver a compelling bull argument, refute the bear's concerns, and engage in a dynamic debate that demonstrates the strengths of the bull position.
+
+Frame your case as analytical observation — describe what the bull thesis implies and which evidence supports it. Avoid imperative or directive language ("you should", "the right move is", "the only play") and do not address the reader directly.
 """
 
         response = llm.invoke(prompt)

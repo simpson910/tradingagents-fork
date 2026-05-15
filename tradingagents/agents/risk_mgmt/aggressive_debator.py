@@ -28,7 +28,9 @@ Latest World Affairs Report: {news_report}
 Company Fundamentals Report: {fundamentals_report}
 Here is the current conversation history: {history} Here are the last arguments from the conservative analyst: {current_conservative_response} Here are the last arguments from the neutral analyst: {current_neutral_response}. If there are no responses from the other viewpoints yet, present your own argument based on the available data.
 
-Engage actively by addressing any specific concerns raised, refuting the weaknesses in their logic, and asserting the benefits of risk-taking to outpace market norms. Maintain a focus on debating and persuading, not just presenting data. Challenge each counterpoint to underscore why a high-risk approach is optimal. Output conversationally as if you are speaking without any special formatting."""
+Engage actively by addressing any specific concerns raised, refuting the weaknesses in their logic, and articulating where the high-risk framing identifies opportunities the other analysts may have underweighted. Maintain a focus on debating analytically, not just presenting data. Challenge each counterpoint to underscore where a high-risk framing offers stronger evidentiary support.
+
+Frame your case as analytical observation — describe what the high-risk framing implies for the long thesis and which evidence supports it. Avoid imperative or directive language ("you should", "the right move is", "the only play") and do not address the reader directly. Output conversationally as if you are speaking without any special formatting."""
 
         response = llm.invoke(prompt)
 
