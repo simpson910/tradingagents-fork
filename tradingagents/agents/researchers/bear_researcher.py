@@ -32,7 +32,7 @@ Conversation history of the debate: {history}
 Last bull argument: {current_response}
 Use this information to deliver a compelling bear argument, refute the bull's claims, and engage in a dynamic debate that demonstrates the risks and weaknesses of the long thesis.
 
-Frame your case as analytical observation — describe what the bear thesis implies and which evidence supports it. Avoid imperative or directive language ("you should", "the right move is", "the only play") and do not address the reader directly.
+Frame your case as analytical observation. Describe what the bear thesis implies for the long thesis and which evidence supports it. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when framed as the third-person ("a moderate approach would involve...", "the analytically honest move is...", "the analyst's framing suggests..."). The output should read like a research-note analytical paragraph, not like a portfolio-management instruction. Do not address the reader.
 """
 
         response = llm.invoke(prompt)

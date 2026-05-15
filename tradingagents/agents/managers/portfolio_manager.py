@@ -68,7 +68,7 @@ def create_portfolio_manager(llm):
 
 ---
 
-Be decisive and ground every conclusion in specific evidence from the analysts. Frame everything as analytical observation — describe what the case implies for the long thesis, not what a reader should do.{get_style_instruction()}"""
+Be decisive and ground every conclusion in specific evidence from the analysts. Frame everything as analytical observation — describe what the case implies for the long thesis, not what a reader should do. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when synthesising or quoting the analysts' framings. The closing view should read like a research-note analytical paragraph, not like a portfolio-management instruction.{get_style_instruction()}"""
 
         final_trade_decision = invoke_structured_or_freetext(
             structured_llm,

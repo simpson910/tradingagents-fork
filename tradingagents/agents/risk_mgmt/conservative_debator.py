@@ -30,7 +30,7 @@ Here is the current conversation history: {history} Here is the last response fr
 
 Engage by questioning their optimism and emphasizing the potential downsides they may have overlooked. Address each of their counterpoints to articulate where a conservative framing better reflects downside exposure. Focus on debating and critiquing their arguments to demonstrate where the low-risk framing has stronger evidentiary support.
 
-Frame your case as analytical observation — describe what the capital-preservation framing implies for the long thesis and which evidence supports it. Avoid imperative or directive language ("you should", "the right move is", "the only play") and do not address the reader directly. Output conversationally as if you are speaking without any special formatting."""
+Frame your case as analytical observation. Describe what the capital-preservation framing implies for the long thesis and which evidence supports it. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when framed as the third-person ("a moderate approach would involve...", "the analytically honest move is...", "the analyst's framing suggests..."). The output should read like a research-note analytical paragraph, not like a portfolio-management instruction. Do not address the reader. Output conversationally as if you are speaking without any special formatting."""
 
         response = llm.invoke(prompt)
 
