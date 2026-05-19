@@ -44,6 +44,36 @@ def get_style_instruction() -> str:
     return style + f" Write your entire response in {lang}."
 
 
+# === STEELMAN PATCH: risk-panel new-dimension requirement (2026-05-19) ===
+# Reason: cross-report eval of 6 V4-Flash debates found that the 3-way
+# risk panel (Aggressive / Conservative / Neutral) consistently reworded
+# arguments already raised in the Round-1 Bull/Bear debate or in the
+# four analyst reports. ~25% of LangGraph compute wasted on
+# rehash. Risk panel's editorial value comes from introducing dimensions
+# the structural debate missed — tail risk, optionality, correlation /
+# hedge implications, regulatory scenarios, time-horizon arbitrage.
+# Detection in scripts/eval-reports.mjs is soft (keyword presence in
+# risk_debate_history); the prompt-side requirement here is the real
+# fix.
+# === END STEELMAN PATCH ===
+def get_risk_panel_new_dimension_instruction() -> str:
+    """Append to risk-panel debater prompts. Forces new-dimension surfacing."""
+    return (
+        " Your responsibility is to surface at least one analytical "
+        "dimension that the four analyst reports (Market / Sentiment / "
+        "News / Fundamentals) did not cover. Acceptable dimensions "
+        "include: tail-risk stress scenarios (what if the multiple "
+        "compresses 30% or revenue contracts 20%), unpriced optionality "
+        "(scenarios neither the bull nor bear case has discounted), "
+        "correlation / hedge implications (how this name moves with its "
+        "sector or with a paired ticker), regulatory or policy scenarios "
+        "(legal, antitrust, tariff, rate environment), and time-horizon "
+        "arbitrage (short-term mispricing vs long-term thesis). Do NOT "
+        "reword arguments already in the analyst reports — that is "
+        "wasted compute. Name the new dimension explicitly."
+    )
+
+
 def build_instrument_context(ticker: str) -> str:
     """Describe the exact instrument so agents preserve exchange-qualified tickers."""
     return (

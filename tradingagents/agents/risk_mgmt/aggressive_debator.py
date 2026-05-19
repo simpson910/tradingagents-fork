@@ -1,5 +1,8 @@
 
 
+from tradingagents.agents.utils.agent_utils import get_risk_panel_new_dimension_instruction
+
+
 def create_aggressive_debator(llm):
     def aggressive_node(state) -> dict:
         risk_debate_state = state["risk_debate_state"]
@@ -30,7 +33,7 @@ Here is the current conversation history: {history} Here are the last arguments 
 
 Engage actively by addressing any specific concerns raised, refuting the weaknesses in their logic, and articulating where the high-risk framing identifies opportunities the other analysts may have underweighted. Maintain a focus on debating analytically, not just presenting data. Challenge each counterpoint to underscore where a high-risk framing offers stronger evidentiary support.
 
-Frame your case as analytical observation. Describe what the high-risk framing implies for the long thesis and which evidence supports it. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when framed as the third-person ("a moderate approach would involve...", "the analytically honest move is...", "the analyst's framing suggests..."). The output should read like a research-note analytical paragraph, not like a portfolio-management instruction. Do not address the reader. Output conversationally as if you are speaking without any special formatting."""
+Frame your case as analytical observation. Describe what the high-risk framing implies for the long thesis and which evidence supports it. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when framed as the third-person ("a moderate approach would involve...", "the analytically honest move is...", "the analyst's framing suggests..."). The output should read like a research-note analytical paragraph, not like a portfolio-management instruction. Do not address the reader. Output conversationally as if you are speaking without any special formatting.{get_risk_panel_new_dimension_instruction()}"""
 
         response = llm.invoke(prompt)
 
