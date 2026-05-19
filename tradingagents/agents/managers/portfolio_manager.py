@@ -28,6 +28,28 @@ from tradingagents.agents.utils.structured import (
 )
 
 
+# === STEELMAN PATCH: anti-template framing (2026-05-19) ===
+# Reason: cross-report eval of 6 V4-Flash debates found the same
+# asymmetric framing template ("the bull case requires X simultaneous
+# victories / the bear case only needs Y failures") reused unchanged
+# across NFLX, META, and MSFT — rhetorical pattern, not evidence-driven
+# analysis. Detection lives in scripts/eval-reports.mjs as the
+# `bull-requires-simultaneous` / `bear-only-needs` / `long-requires-
+# execution` regex set. On upstream re-port, preserve this instruction
+# by appending its body inside the Editor prompt's f-string.
+# === END STEELMAN PATCH ===
+_ANTI_TEMPLATE_INSTRUCTION = (
+    "\n\nAvoid templated asymmetric framings of the form \"the bull case "
+    "requires X simultaneous victories\" or \"the bear case only needs one "
+    "to fail\" or \"the long thesis requires near-perfect execution.\" "
+    "That structure exaggerates the asymmetry between the two sides "
+    "through rhetoric rather than evidence. If one side genuinely has a "
+    "lower bar to being right, identify the specific datapoint or "
+    "condition that makes it so, name it, and explain why — do not "
+    "assert the asymmetry as a structural truism."
+)
+
+
 def create_portfolio_manager(llm):
     structured_llm = bind_structured(llm, PortfolioDecision, "Editor")
 
@@ -68,7 +90,7 @@ def create_portfolio_manager(llm):
 
 ---
 
-Be decisive and ground every conclusion in specific evidence from the analysts. Frame everything as analytical observation — describe what the case implies for the long thesis, not what a reader should do. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when synthesising or quoting the analysts' framings. The closing view should read like a research-note analytical paragraph, not like a portfolio-management instruction.{get_style_instruction()}"""
+Be decisive and ground every conclusion in specific evidence from the analysts. Frame everything as analytical observation — describe what the case implies for the long thesis, not what a reader should do. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when synthesising or quoting the analysts' framings. The closing view should read like a research-note analytical paragraph, not like a portfolio-management instruction.{_ANTI_TEMPLATE_INSTRUCTION}{get_style_instruction()}"""
 
         final_trade_decision = invoke_structured_or_freetext(
             structured_llm,
