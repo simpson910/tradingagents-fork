@@ -14,6 +14,18 @@ from tradingagents.agents.utils.structured import (
 )
 
 
+# STEELMAN PATCH (2026-05-15, marked 2026-05-19): the entire prompt below
+# is a Steelman rewrite of the upstream Trader role. Key Steelman edits:
+# - Vocabulary: "directional sub-lean" replaces upstream Buy/Hold/Sell
+#   action words; uses Bullish/Neutral/Bearish trichotomy
+# - Framing: "analytical observation… never what a reader should do"
+#   guardrail to keep editorial-commentary posture
+# - Structured output: TraderProposal Pydantic schema (no upstream
+#   "TraderAction" enum with Buy/Sell values)
+# On upstream re-port, replace any returned upstream prompt entirely
+# rather than merging diffs — this rewrite is total, not additive.
+
+
 def create_trader(llm):
     structured_llm = bind_structured(llm, TraderProposal, "Trader")
 

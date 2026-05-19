@@ -3,6 +3,15 @@
 from tradingagents.agents.utils.agent_utils import get_risk_panel_new_dimension_instruction
 
 
+# STEELMAN PATCH (2026-05-15, marked 2026-05-19): the "Frame your case
+# as analytical observation… not like a portfolio-management instruction.
+# Do not address the reader." paragraph at the END of the prompt below
+# is a Steelman addition (see docs/agents.md fork-patches table, commits
+# f9d2024 + c23518c). Plus the 2026-05-19 risk-panel new-dimension
+# instruction appended via the imported helper. Preserve both on
+# upstream re-port.
+
+
 def create_aggressive_debator(llm):
     def aggressive_node(state) -> dict:
         risk_debate_state = state["risk_debate_state"]

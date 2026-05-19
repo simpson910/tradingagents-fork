@@ -10,6 +10,20 @@ from tradingagents.agents.utils.structured import (
 )
 
 
+# STEELMAN PATCH (2026-05-15, marked 2026-05-19): the entire prompt below
+# is a Steelman rewrite of the upstream Research Manager role. Two key
+# Steelman elements that MUST be preserved on upstream re-port:
+# 1. The 5-tier Lean Scale (Strong Bullish / Bullish Lean / Neutral /
+#    Bearish Lean / Strong Bearish) replaces upstream's Buy/Hold/Sell.
+#    parse_rating in tradingagents/agents/utils/rating.py expects these
+#    exact tokens; renaming requires updating both files in lockstep.
+# 2. "Frame your synthesis as analytical observation — describe what the
+#    case implies for the long thesis, not what a reader should do."
+#    This is the analytical-observation guardrail; do not remove.
+# On upstream re-port, replace any returned upstream prompt entirely
+# rather than merging diffs.
+
+
 def create_research_manager(llm):
     structured_llm = bind_structured(llm, ResearchPlan, "Research Manager")
 

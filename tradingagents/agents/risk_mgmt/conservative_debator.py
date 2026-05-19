@@ -3,6 +3,13 @@
 from tradingagents.agents.utils.agent_utils import get_risk_panel_new_dimension_instruction
 
 
+# STEELMAN PATCH (2026-05-15, marked 2026-05-19): same as the other risk
+# debaters — analytical-observation guardrail paragraph at the END of
+# the prompt is a Steelman addition (commits f9d2024 + c23518c), plus
+# the 2026-05-19 risk-panel new-dimension helper. Preserve both on
+# upstream re-port.
+
+
 def create_conservative_debator(llm):
     def conservative_node(state) -> dict:
         risk_debate_state = state["risk_debate_state"]

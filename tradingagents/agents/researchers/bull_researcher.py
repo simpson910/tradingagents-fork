@@ -1,3 +1,9 @@
+# STEELMAN PATCH (2026-05-15, marked 2026-05-19): the "Frame your case
+# as analytical observation… The output should read like a research-note
+# analytical paragraph, not like a portfolio-management instruction. Do
+# not address the reader." paragraph at the END of the prompt below is
+# a Steelman addition (see docs/agents.md fork-patches table, commits
+# f9d2024 + c23518c). Preserve verbatim on upstream re-port.
 
 
 def create_bull_researcher(llm):
