@@ -50,6 +50,34 @@ _ANTI_TEMPLATE_INSTRUCTION = (
 )
 
 
+# === STEELMAN PATCH: weighting transparency (2026-05-19) ===
+# Reason: cross-report eval found Editor's final lean averaged 1.05
+# rungs more bearish than the sub-lean average across 6 V4-Flash
+# debates — every report negative. Most extreme: NVDA where all four
+# sub-leans were Bullish but Editor closed Neutral; MSFT where three
+# of four were Bullish but Editor closed Bearish Lean. The downshift
+# is structural, not data-driven — Editor synthesises silently using
+# language like "prudent caution warranted" rather than naming which
+# sub-lean got more weight and why. This patch forces the weighting
+# to be explicit and anchored to a specific datapoint whenever the
+# Editor's lean differs from the analyst majority. Detection: the
+# `Editor delta vs sub-lean average` axis in scripts/eval-reports.mjs;
+# expected effect over time is mean delta converging toward zero.
+# === END STEELMAN PATCH ===
+_WEIGHTING_TRANSPARENCY_INSTRUCTION = (
+    "\n\nIf your closing lean differs from the simple majority of analyst "
+    "sub-leans (Market / Sentiment / News / Fundamentals), state explicitly "
+    "which sub-lean(s) you weighted more heavily and name the specific "
+    "datapoint that justifies the weighting. Acceptable form: \"I weight "
+    "the technical setup over the unanimous fundamental Bullish reading "
+    "because [named indicator + named historical precedent + named time "
+    "horizon].\" Not acceptable: \"prudent caution is warranted,\" \"the "
+    "evidence tilts bearish,\" or any phrasing that asserts a weighting "
+    "without naming the data. The synthesis is a named, evidence-anchored "
+    "weighting decision — never a default toward caution."
+)
+
+
 def create_portfolio_manager(llm):
     structured_llm = bind_structured(llm, PortfolioDecision, "Editor")
 
@@ -90,7 +118,7 @@ def create_portfolio_manager(llm):
 
 ---
 
-Be decisive and ground every conclusion in specific evidence from the analysts. Frame everything as analytical observation — describe what the case implies for the long thesis, not what a reader should do. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when synthesising or quoting the analysts' framings. The closing view should read like a research-note analytical paragraph, not like a portfolio-management instruction.{_ANTI_TEMPLATE_INSTRUCTION}{get_style_instruction()}"""
+Be decisive and ground every conclusion in specific evidence from the analysts. Frame everything as analytical observation — describe what the case implies for the long thesis, not what a reader should do. Do not recommend, advocate for, or describe specific actions, position sizes, entries, exits, or price zones at which a reader should add or trim exposure — even when synthesising or quoting the analysts' framings. The closing view should read like a research-note analytical paragraph, not like a portfolio-management instruction.{_ANTI_TEMPLATE_INSTRUCTION}{_WEIGHTING_TRANSPARENCY_INSTRUCTION}{get_style_instruction()}"""
 
         final_trade_decision = invoke_structured_or_freetext(
             structured_llm,
