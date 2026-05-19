@@ -3,6 +3,29 @@ from tradingagents.agents.utils.agent_utils import build_instrument_context, get
 from tradingagents.dataflows.config import get_config
 
 
+# === STEELMAN PATCH: sentiment source-citation (2026-05-19) ===
+# Reason: cross-report eval of 6 V4-Flash debates found that every
+# sentiment_report contained narrative claims of the form "commentators
+# noting" / "chatter dominated" / "social media users said" without
+# naming the source platform. Editorial-commentary posture requires that
+# every sentiment observation be traceable to a specific platform or
+# publication; otherwise the section is anecdote dressed as evidence.
+# Detection: scripts/eval-reports.mjs `Sentiment claims without source`
+# axis (uses SENTIMENT_UNSOURCED regex + SOURCE_HINTS proximity window).
+# === END STEELMAN PATCH ===
+_SOURCE_CITATION_INSTRUCTION = (
+    " For every sentiment observation, attribute the claim to a specific "
+    "source: name the platform (e.g. \"r/wallstreetbets\", \"Twitter "
+    "cashtag mentions\", \"StockTwits\"), the publication (e.g. \"per "
+    "StockStory\", \"via Marketing Dive\"), or the analyst/firm. Do NOT "
+    "write sentiment claims of the form \"commentators noted\" or "
+    "\"chatter dominated\" or \"social media users said\" without "
+    "naming the source. If you cannot identify a specific source for a "
+    "claim, omit the claim entirely — vague attribution is worse than "
+    "no claim."
+)
+
+
 def create_social_media_analyst(llm):
     def social_media_analyst_node(state):
         current_date = state["trade_date"]
@@ -14,6 +37,7 @@ def create_social_media_analyst(llm):
 
         system_message = (
             "You are a social media and company specific news researcher/analyst tasked with analyzing social media posts, recent company news, and public sentiment for a specific company over the past week. You will be given a company's name your objective is to write a comprehensive long report detailing your analysis and implications for editorial readers on this company's current state after looking at social media and what people are saying about that company, analyzing sentiment data of what people feel each day about the company, and looking at recent company news. Use the get_news(query, start_date, end_date) tool to search for company-specific news and social media discussions. Try to look at all sources possible from social media to sentiment to news. Provide specific observations with supporting evidence for editorial readers' consideration."
+            + _SOURCE_CITATION_INSTRUCTION
             + """ Make sure to append a Markdown table at the end of the report to organize key points in the report, organized and easy to read."""
             + get_style_instruction()
         )
