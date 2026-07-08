@@ -1,21 +1,29 @@
+import json
+
 from .alpha_vantage_common import _make_api_request
 
 
 def _filter_reports_by_date(result, curr_date: str):
-    """Filter annualReports/quarterlyReports to exclude entries after curr_date.
+    """Drop annual/quarterly reports dated after curr_date to prevent look-ahead.
 
-    Prevents look-ahead bias by removing fiscal periods that end after
-    the simulation's current date.
+    Alpha Vantage returns fundamentals payloads as JSON strings, so parse,
+    filter, and re-serialize. Non-JSON bodies or unset dates pass through.
     """
-    if not curr_date or not isinstance(result, dict):
+    if not curr_date or not isinstance(result, str):
+        return result
+    try:
+        payload = json.loads(result)
+    except json.JSONDecodeError:
+        return result
+    if not isinstance(payload, dict):
         return result
     for key in ("annualReports", "quarterlyReports"):
-        if key in result:
-            result[key] = [
-                r for r in result[key]
+        if isinstance(payload.get(key), list):
+            payload[key] = [
+                r for r in payload[key]
                 if r.get("fiscalDateEnding", "") <= curr_date
             ]
-    return result
+    return json.dumps(payload)
 
 
 def get_fundamentals(ticker: str, curr_date: str = None) -> str:
@@ -52,4 +60,3 @@ def get_income_statement(ticker: str, freq: str = "quarterly", curr_date: str = 
     """Retrieve income statement data for a given ticker symbol using Alpha Vantage."""
     result = _make_api_request("INCOME_STATEMENT", {"symbol": ticker})
     return _filter_reports_by_date(result, curr_date)
-
